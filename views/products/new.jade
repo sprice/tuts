@@ -1,0 +1,2 @@
+h2 Create new product #{product.name}
+form(action='/products', method='post')!= partial('products/product_form', {locals: {product: product}})

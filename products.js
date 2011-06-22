@@ -27,3 +27,24 @@ module.exports.find = function(id) {
   };
   return found;
 }
+
+module.exports.set = function(id, product) {
+  id = parseInt(id, 10);
+  product.id = id;
+  products[id - 1] = product;
+};
+
+module.exports.new = function() {
+  return {
+    name: '',
+    description: '',
+    price: 0
+  };
+}
+
+module.exports.insert = function(product) {
+  var id = products.length + 1;
+  product.id = id;
+  products[id - 1] = product;
+  return id;
+}
