@@ -1,6 +1,6 @@
 {
   "name": "tuts",
-  "description": "Express app based on example by Pedro Teixeira on http://nodetuts.com",
+  "description": "Express app based on examples by Pedro Teixeira on http://nodetuts.com.",
   "version": "0.0.2",
   "dependencies": {
     "express": ">= 2.3.0",

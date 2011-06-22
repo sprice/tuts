@@ -1,7 +1,7 @@
 # Tuts
 
-[Express](http://expressjs.com/) app based on the examples by [Pedro Teixeira](https://twitter.com/pedrogteixeira)
-on [Node Tuts](http://nodetuts.com)
+[Express](http://expressjs.com/) app based on examples by [Pedro Teixeira](https://twitter.com/pedrogteixeira)
+on [Node Tuts](http://nodetuts.com).
 
 ## Usage
 
