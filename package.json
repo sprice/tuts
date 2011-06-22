@@ -1,7 +1,7 @@
 {
   "name": "teixeira",
   "description": "Express app based on example by Pedro Teixeira on http://nodetuts.com",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "express": ">= 2.3.0",
     "jade": ">= 0.10.0"
