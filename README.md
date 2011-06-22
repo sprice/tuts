@@ -6,4 +6,5 @@ example Express app by [Pedro Teixeira](https://twitter.com/pedrogteixeira) on
 
 ## Usage
 
-`npm install`
+    $ npm install
+    $ node app.js
