@@ -1,3 +1,5 @@
+// https://gist.github.com/709733
+
 var products = [
 {
   id: 1,
