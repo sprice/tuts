@@ -1,7 +1,13 @@
-var express = require('express');
-var products = require('./products');
+var express  = require('express'),
+    form     = require('connect-form'),
+    fs       = require('fs'),
+    util     = require('util'),
+    products = require('./products'),
+    photos = require('./photos');
 
-var app = express.createServer();
+var app = express.createServer(
+  form({keepExtensions: true})
+);
 
 // Configuration
 
@@ -22,7 +28,11 @@ app.configure('production', function () {
   app.use(express.errorHandler());
 });
 
-// Routes
+/**
+ * Routes
+ */
+
+// Products
 
 app.get('/', function(req, res) {
   res.render('root');
@@ -54,8 +64,14 @@ app.get('/products/:id', function(req, res) {
 
 app.get('/products/:id/edit', function(req, res) {
   var product = products.find(req.params.id);
-  res.render('products/edit', {
-    product: product
+  photos.list(function(err, photo_list) {
+    if (err) {
+      throw err;
+    }
+    res.render('products/edit', {
+      product: product,
+      photos: photo_list
+    });
   });
 });
 
@@ -65,8 +81,40 @@ app.put('/products/:id', function(req, res) {
   res.redirect('/products/'+id);
 });
 
-// Only listen on $ node app.js
+// Photos
 
+app.get('/photos', function(req, res) {
+  photos.list(function(err, photo_list) {
+    res.render('photos/index', {
+      photos: photo_list
+    });
+  })
+});
+
+app.get('/photos/new', function(req, res) {
+  res.render('photos/new');
+});
+
+app.post('/photos', function(req, res) {
+  // from https://gist.github.com/893110
+  req.form.complete(function(err, fields, files) {
+    if(err) {
+      next(err);
+    } else {
+      ins = fs.createReadStream(files.photo.path);
+      ous = fs.createWriteStream(__dirname + '/public/uploads/photos/' + files.photo.filename);
+      util.pump(ins, ous, function(err) {
+        if(err) {
+          next(err);
+        } else {
+          res.redirect('/photos');
+        }
+      });
+    }
+  });
+});
+
+// Only listen on $ node app.js
 if (!module.parent) {
   app.listen(4000);
   console.log("Express server listening on port %d", app.address().port);
