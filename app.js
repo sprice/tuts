@@ -2,9 +2,15 @@ var express  = require('express'),
     form     = require('connect-form'),
     fs       = require('fs'),
     util     = require('util'),
-    products = require('./products'),
-    photos   = require('./photos'),
-    users    = require('./users');
+    photos   = require('./photos');
+
+// db
+var Mongoose = require('mongoose');
+var db = Mongoose.connect('mongodb://localhost/tuts');
+
+require('./schema');
+var User = db.model('User');
+var Product = db.model('Product');
 
 var app = express.createServer(
   form({keepExtensions: true})
@@ -55,7 +61,7 @@ function requiresLogin(req, res, next){
  * Routes
  */
 
-// Products
+// Sessions
 
 app.get('/', function(req, res) {
   res.render('root');
@@ -68,7 +74,7 @@ app.get('/sessions/new', function(req, res) {
 });
 
 app.post('/sessions', function(req, res) {
-  users.authenticate(req.body.login, req.body.password, function(user) {
+  User.authenticate(req.body.login, req.body.password, function(user) {
     if (user) {
       req.session.user = user;
       res.redirect(req.body.redir || '/');
@@ -86,47 +92,70 @@ app.get('/sessions/destroy', function(req, res) {
   res.redirect('/sessions/new');
 });
 
+// Products
+
 app.get('/products', function(req, res) {
-  res.render('products/index', {
-    products: products.all
+  Product.find({}, function(err, products) {
+    res.render('products/index', {
+      products: products
+    });
   });
 });
+
 
 app.get('/products/new', requiresLogin, function(req, res) {
-  res.render('products/new', {
-    product: req.body && req.body.product || products.new()
-  });
-});
-
-app.post('/products', requiresLogin, function(req, res) {
-  var id = products.insert(req.body.product);
-  res.redirect('/products/'+id);
-});
-
-app.get('/products/:id', function(req, res) {
-  var product = products.find(req.params.id);
-  res.render('products/show', {
-    product: product
-  });
-});
-
-app.get('/products/:id/edit', requiresLogin,  function(req, res) {
-  var product = products.find(req.params.id);
   photos.list(function(err, photo_list) {
     if (err) {
       throw err;
     }
-    res.render('products/edit', {
-      product: product,
-      photos: photo_list
+    res.render('products/new', {
+      photos: photo_list,
+      product: req.body && req.body.product || new Product()
+    });
+  });
+});
+
+
+app.post('/products', requiresLogin, function(req, res) {
+  var product = new Product(req.body.product);
+  product.save(function() {
+    res.redirect('/products/' + product._id.toHexString());
+  });
+});
+
+app.get('/products/:id', function(req, res) {
+  Product.findById(req.params.id, function(err, product){
+    res.render('products/show', {
+      product: product
+    });
+  });
+});
+
+app.get('/products/:id/edit', requiresLogin,  function(req, res) {
+  Product.findById(req.params.id, function(err, product){
+    photos.list(function(err, photo_list) {
+      if (err) {
+        throw err;
+      }
+      res.render('products/edit', {
+        product: product,
+        photos: photo_list
+      });
     });
   });
 });
 
 app.put('/products/:id', requiresLogin, function(req, res) {
   var id = req.params.id;
-  products.set(id, req.body.product);
-  res.redirect('/products/'+id);
+  Product.findById(id, function(err, product){
+    product.name = req.body.product.name;
+    product.description = req.body.product.description;
+    product.price = req.body.product.price;
+    product.photo = req.body.product.photo;
+    product.save(function() {
+      res.redirect('/products/' + product._id.toHexString());
+    });
+  });
 });
 
 // Photos
