@@ -5,5 +5,12 @@ html
     title Tuts
   body
     #main
+      #header
+        - if (session.user)
+          #user!= 'logged in as ' + session.user.login
+          #logout
+            a(href='/sessions/destroy') Logout
+      - if (flash.warn)
+        p.warn!= flash.warn
       h1 Express Store
       #container!= body

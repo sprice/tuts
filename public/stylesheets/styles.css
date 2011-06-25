@@ -9,3 +9,23 @@ body {
   border: 1px solid #ddd;
   padding: 1em;
 }
+
+#header {
+  float: right;
+  clear: both;
+}
+
+#logout {
+  float: left;
+}
+
+#user {
+  float: right;
+  margin-left: 1em;
+}
+
+.warn {
+  background-color: #fdd;
+  border: 1px solid #f00;
+  padding: 1em;
+}
